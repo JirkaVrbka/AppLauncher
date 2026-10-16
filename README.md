@@ -122,16 +122,24 @@ relative to `shell.qml`, so keep all files together in one directory.
 
 ## Usage
 
-Run the shell, pointing Quickshell at `shell.qml`:
+**1. Register the config.** Quickshell discovers configs by name under
+`~/.config/quickshell/<name>/shell.qml`. Symlink this repo in as `launcher`:
 
 ```bash
-qs -p /path/to/AppLauncher/shell.qml
-# or:  quickshell -p /path/to/AppLauncher/shell.qml
+ln -s /path/to/AppLauncher ~/.config/quickshell/launcher
 ```
 
-The launcher is meant to be bound to a global shortcut. In **System Settings →
-Shortcuts → Custom Shortcuts**, add a command shortcut (e.g. `Meta`) that runs
-the command above.
+**2. Run it:**
+
+```bash
+qs -c launcher
+# or by path:  qs -p /path/to/AppLauncher/shell.qml
+```
+
+**3. Bind a hotkey.** In **System Settings → Shortcuts → Custom Shortcuts**, add
+a command shortcut (e.g. `Meta+Space`) that runs `qs -c launcher`. Each press
+launches a fresh instance; the launcher closes itself after you act or press
+`Esc`.
 
 ### Scopes
 

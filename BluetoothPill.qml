@@ -18,7 +18,14 @@ Item {
     readonly property var availList: _all.filter(d => !d.paired && !d.connected)
     readonly property var primary: connectedList.length > 0 ? connectedList[0] : null
 
-    visible: adapter !== null
+    // Show the pill immediately with loading dots while the Bluetooth service
+    // resolves the adapter; if none has appeared by the time the grace period
+    // ends, there is no bluetooth hardware, so hide the pill for good.
+    readonly property bool loaded: adapter !== null
+    property bool graceOver: false
+    Timer { interval: 2500; running: true; repeat: false; onTriggered: root.graceOver = true }
+
+    visible: loaded || !graceOver
     implicitWidth: fp.implicitWidth
     implicitHeight: fp.implicitHeight
 
@@ -54,7 +61,8 @@ Item {
         panelWidth: 286
         maxLabelWidth: 150
         glyph: Icons.bluetooth
-        label: root.primary ? root.primary.name
+        label: !root.loaded ? Loading.dots()
+            : root.primary ? root.primary.name
             : (root.adapter && root.adapter.enabled ? "bluetooth" : "off")
         accent: root.connectedList.length > 0 ? Theme.blue
             : (root.adapter && root.adapter.enabled ? Theme.fg : Theme.grey)

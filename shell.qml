@@ -586,15 +586,27 @@ PanelWindow {
         onExited: infoProc.running = true   // refresh the pill
     }
 
-    TopBar {
+    // The top bar — and its Bluetooth/Pipewire/UPower/Mpris service pills — isn't
+    // needed to start typing, so load it asynchronously: the first frame is just
+    // the scrim + search panel (focused, typeable) and the bar appears a moment
+    // later. Loading by URL (not an inline component) keeps TopBar.qml and the
+    // pill files it pulls in — MediaPill, VolumeControl, BluetoothPill, WifiVpnPill
+    // and their service imports — off shell.qml's own compile path; `asynchronous`
+    // then builds that subtree without blocking the first frame. Wired in onLoaded.
+    Loader {
+        id: topBarLoader
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
         anchors.leftMargin: 24
         anchors.rightMargin: 24
         anchors.topMargin: 20
-        info: root.topInfo
-        onLayoutClicked: if (!layoutSwitch.running) layoutSwitch.running = true
+        asynchronous: true
+        source: "TopBar.qml"
+        onLoaded: {
+            item.info = Qt.binding(() => root.topInfo)
+            item.layoutClicked.connect(() => { if (!layoutSwitch.running) layoutSwitch.running = true })
+        }
     }
 
     Rectangle {

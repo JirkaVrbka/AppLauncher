@@ -13,6 +13,11 @@ Item {
     property var net: ({ wifiEnabled: false, ssid: "", vpnActive: false, networks: [], vpns: [] })
     readonly property bool open: fp.open
 
+    // True once the first nmcli result has arrived. Until then the pill shows the
+    // shared animated loading dots instead of a false "off": the default net
+    // value is a placeholder, not the real radio state.
+    property bool loaded: false
+
     visible: true
     implicitWidth: fp.implicitWidth
     implicitHeight: fp.implicitHeight
@@ -30,7 +35,7 @@ Item {
         command: ["bash", root.script]
         stdout: StdioCollector {
             id: netOut
-            onStreamFinished: { try { root.net = JSON.parse(netOut.text) } catch (e) {} }
+            onStreamFinished: { try { root.net = JSON.parse(netOut.text); root.loaded = true } catch (e) {} }
         }
     }
     function refresh() { if (!netProc.running) netProc.running = true }
@@ -52,8 +57,9 @@ Item {
         panelWidth: 300
         maxLabelWidth: 150
         glyph: Icons.wifi
-        accent: root.net.wifiEnabled ? Theme.purple : Theme.grey
-        label: root.net.ssid.length > 0 ? root.net.ssid
+        accent: !root.loaded ? Theme.grey : (root.net.wifiEnabled ? Theme.purple : Theme.grey)
+        label: !root.loaded ? Loading.dots()
+            : root.net.ssid.length > 0 ? root.net.ssid
             : (root.net.wifiEnabled ? "wi-fi" : "off")
         onPillTapped: root.toggleRadio()
 

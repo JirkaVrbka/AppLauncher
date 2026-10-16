@@ -12,6 +12,9 @@ The launcher is split into singletons + components so the design is reusable:
 
 - `Theme.qml` *(singleton)* — color tokens, `mono` font, `hl()`/`escapeHtml()`.
 - `PowerActions.qml` *(singleton)* — the power-action data list.
+- `Loading.qml` *(singleton)* — shared animated loading dots (`dots()` → `•··`,
+  `·•·`, `··•`) for pills awaiting async data; fixed mono width so a loading pill
+  never jiggles its neighbours. Used by `WifiVpnPill`, `BluetoothPill`, `VolumeControl`.
 - `ScopeInput.qml` — the search capsule (mode chip, field, count chip); owns
   scope entry/exit, emits navigation/submit signals.
 - `ResultRow.qml` — one pill-style result row; the `ListView` delegate.

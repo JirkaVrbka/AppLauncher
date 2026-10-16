@@ -16,6 +16,10 @@ Item {
     readonly property real level: sink && sink.audio ? sink.audio.volume : 0
     readonly property bool open: fp.open
 
+    // False until the Pipewire sink + its audio props are available. Until then
+    // the pill shows the shared loading dots instead of a misleading "0%".
+    readonly property bool loaded: sink && sink.audio
+
     implicitWidth: fp.implicitWidth
     implicitHeight: fp.implicitHeight
 
@@ -49,8 +53,8 @@ Item {
         side: Qt.AlignRight
         panelWidth: 290
         maxLabelWidth: 90
-        glyph: (root.muted || root.volPct === 0) ? Icons.volumeMute : Icons.volume
-        label: root.muted ? "muted" : (root.volPct + "%")
+        glyph: !root.loaded ? Icons.volume : ((root.muted || root.volPct === 0) ? Icons.volumeMute : Icons.volume)
+        label: !root.loaded ? Loading.dots() : (root.muted ? "muted" : (root.volPct + "%"))
         accent: root.muted ? Theme.red : Theme.blue
         onPillTapped: root.toggleMute()
 
